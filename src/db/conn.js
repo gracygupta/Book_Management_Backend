@@ -1,6 +1,13 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
+
 const conn_str =
-  "mongodb+srv://gracygupta04:Nilesh2502@books.fd3ppny.mongodb.net/booksManage?retryWrites=true&w=majority";
+  process.env.DB_Host +
+  "://" +
+  process.env.DB_USER +
+  ":" +
+  process.env.DB_PASSWORD +
+  "@books.fd3ppny.mongodb.net/booksManage?retryWrites=true&w=majority";
 
 mongoose.connect(
   conn_str,
