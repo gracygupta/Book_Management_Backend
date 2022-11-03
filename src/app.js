@@ -1,19 +1,50 @@
+//requirements
 const express = require("express");
 const bodyParser = require("body-parser");
 require("./db/conn");
+const Book = require("./models/books");
+
 const app = express();
 
-//home route
-app.get("/", function (req, res) {
-  res.send("Thankyou logging in");
-});
+app.use(express.static("public"));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.get("/", function (req, res) {});
 
 //shows all books record
-app.get("/books", function (req, res) {});
 
-//crete new book record
+app.get("/books", function (req, res) {
+  res.sendFile(__dirname + "/html/book_add.html");
+});
+
+//create new book record
 app.post("/books", function (req, res) {
-  res.send("Thankyou logging in");
+  console.log(req.body);
+
+  const bname = req.body.name;
+  const bn_no = req.body.isbn_no;
+  const author = req.body.author_name;
+  const genre = req.body.genre;
+  const inventory = req.body.inventory;
+
+  const book = new Book({
+    name: bname,
+    isbn_no: bn_no,
+    author_name: author,
+    genre: genre,
+    inventory: inventory,
+  });
+
+  book
+    .save()
+    .then(function () {
+      res.send("Book Record Added.");
+    })
+    .catch(function (err) {
+      res.send("Oop! Some error occured. PLease check and try again.");
+      console.log(err);
+    });
 });
 
 //delete all books records
@@ -41,6 +72,6 @@ app.patch("/book/:isbn_no", function (req, res) {});
 app.get("/book/:isbn_no", function (req, res) {});
 
 //listens to port 3000
-app.listen(3000, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log("Server is up");
 });
