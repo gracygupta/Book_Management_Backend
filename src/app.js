@@ -84,7 +84,18 @@ app.get("/books/find_books_needed", async (req, res) => {
 });
 
 //returns all books with inventory 0
-app.get("/books/unavailable_books", function (req, res) {});
+app.get("/books/unavailable_books", async (req, res) => {
+  const booksData = await Book.find({ inventory: 0 });
+  console.log(booksData);
+  var result = "";
+  if (booksData.length === 0) {
+    console.log("No books to show");
+    result = "No books to show";
+  } else {
+    result = booksData;
+  }
+  res.send(result);
+});
 
 //fetch records of particular book
 app.get("/book/:isbn_no", function (req, res) {});
