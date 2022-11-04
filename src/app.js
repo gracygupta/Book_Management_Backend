@@ -58,23 +58,29 @@ app.post("/books", async (req, res) => {
 //delete all books records
 app.delete("/books", async (req, res) => {
   try {
-    Book.method.remove({});
+    Book.remove({});
     console.log("All records deleted");
     res.send("All Documents deleted");
   } catch (e) {
+    console.log(e);
     res.send(e);
   }
 });
 
 //returns books having value less than n in inventory
 app.get("/books/find_books_needed", async (req, res) => {
-  try {
-    const n = req.query.n;
-    const booksData = await Book.find({ inventory: { $lt: 50 } });
-    res.send(booksData);
-  } catch (e) {
-    res.send(e);
+  const n = req.query.n;
+  console.log("Value of n = " + n);
+  var result = "";
+  if (n === undefined) {
+    result = "Please specify query n in the url.";
+    console.log("n not specified");
+  } else {
+    const booksData = await Book.find({ inventory: { $lt: n } });
+    result = booksData;
+    console.log("Data retrieved");
   }
+  res.send(result);
 });
 
 //returns all books with inventory 0
