@@ -97,8 +97,24 @@ app.get("/books/unavailable_books", async (req, res) => {
   res.send(result);
 });
 
+//handling error when params are missing
+app.get("/book", function (req, res) {
+  res.send("Wrong path! Check URL");
+});
+
 //fetch records of particular book
-app.get("/book/:isbn_no", function (req, res) {});
+app.get("/book/:isbn_no", async (req, res) => {
+  var result = "";
+  try {
+    const isbn_no = req.params.isbn_no;
+    const bookData = await Book.find({ isbn_no: isbn_no });
+    console.log("Data retrieved");
+    res.send(bookData);
+  } catch (e) {
+    console.log("error");
+    res.send(e);
+  }
+});
 
 //replace records of a book with aother book record
 app.put("/book/:isbn_no", function (req, res) {});
