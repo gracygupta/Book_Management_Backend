@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 require("./db/conn");
 const Book = require("./models/books");
+const port = process.env.PORT || 8080;
 
 const app = express();
 
@@ -10,16 +11,22 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get("/", function (req, res) {});
+app.get("/", function (req, res) {
+  res.send("thanku");
+});
 
 //shows all books record
-
-app.get("/books", function (req, res) {
-  res.sendFile(__dirname + "/html/book_add.html");
+app.get("/books", async (req, res) => {
+  try {
+    const booksData = await Book.find();
+    res.send(booksData);
+  } catch (e) {
+    res.send(e);
+  }
 });
 
 //create new book record
-app.post("/books", function (req, res) {
+app.post("/books", async (req, res) => {
   console.log(req.body);
 
   const bname = req.body.name;
@@ -42,16 +49,33 @@ app.post("/books", function (req, res) {
       res.send("Book Record Added.");
     })
     .catch(function (err) {
+      console.log(res.statusCode);
       res.send("Oop! Some error occured. PLease check and try again.");
       console.log(err);
     });
 });
 
 //delete all books records
-app.delete("/books", function (req, res) {});
+app.delete("/books", async (req, res) => {
+  try {
+    Book.method.remove({});
+    console.log("All records deleted");
+    res.send("All Documents deleted");
+  } catch (e) {
+    res.send(e);
+  }
+});
 
 //returns books having value less than n in inventory
-app.get("/books/find_books_needed", function (req, res) {});
+app.get("/books/find_books_needed", async (req, res) => {
+  try {
+    const n = req.query.n;
+    const booksData = await Book.find({ inventory: { $lt: 50 } });
+    res.send(booksData);
+  } catch (e) {
+    res.send(e);
+  }
+});
 
 //returns all books with inventory 0
 app.get("/books/unavailable_books", function (req, res) {});
@@ -72,6 +96,6 @@ app.patch("/book/:isbn_no", function (req, res) {});
 app.get("/book/:isbn_no", function (req, res) {});
 
 //listens to port 3000
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Server is up");
+app.listen(port, function () {
+  console.log(`Server is up ${port}`);
 });
