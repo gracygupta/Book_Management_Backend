@@ -19,7 +19,9 @@ app.get("/", function (req, res) {
 app.get("/books", async (req, res) => {
   try {
     const booksData = await Book.find();
-    res.send(booksData);
+    const result = booksData;
+    console.log("Data Retrieved\n" + result);
+    res.send(result);
   } catch (e) {
     res.send(e);
   }
@@ -58,7 +60,15 @@ app.post("/books", async (req, res) => {
 //delete all books records
 app.delete("/books", async (req, res) => {
   try {
-    Book.remove({});
+    const bookDel = Book.deleteMany({});
+    bookDel
+      .then(() => {
+        console.log("success");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    // booksDelete;
     console.log("All records deleted");
     res.send("All Documents deleted");
   } catch (e) {
@@ -66,6 +76,13 @@ app.delete("/books", async (req, res) => {
     res.send(e);
   }
 });
+// Book.deleteMany({})
+//   .then(() => {
+//     console.log("success");
+//   })
+//   .catch((e) => {
+//     console.log(e);
+//   });
 
 //returns books having value less than n in inventory
 app.get("/books/find_books_needed", async (req, res) => {
@@ -97,7 +114,7 @@ app.get("/books/unavailable_books", async (req, res) => {
   res.send(result);
 });
 
-//handling error when params are missing
+//handling get error when params are missing
 app.get("/book", function (req, res) {
   res.send("Wrong path! Check URL");
 });
@@ -111,16 +128,47 @@ app.get("/book/:isbn_no", async (req, res) => {
     console.log("Data retrieved");
     res.send(bookData);
   } catch (e) {
-    console.log("error");
-    res.send(e);
+    console.log(e);
+    res.send("Oops! an error occured, please check URL and try again.");
   }
 });
 
 //replace records of a book with aother book record
-app.put("/book/:isbn_no", function (req, res) {});
+app.put("/book/:from_isbn_no", async (req, res) => {
+  try {
+    const from_isbn_no = req.params.from_isbn_no;
+    if (from_isbn_no) {
+      const name = req.query.name;
+      const genre = req.query.genre;
+      const author = req.query.author_name;
+      const to_isbn_no = parseInt(req.query.to_isbn_no);
+      const inventory = parseInt(req.query.inventory);
+      const bookUpdate = await Book.findOneAndReplace(
+        { isbn_no: from_isbn_no },
+        {
+          isbn_no: to_isbn_no,
+          name: name,
+          genre: genre,
+          author_name: author,
+          inventory: inventory,
+        }
+      );
+      console("Updated");
+      console.log(bookUpdate);
+    }
+  } catch (e) {
+    console.log(e);
+    res.send("Oops! an error occured, please check URL and try again.");
+  }
+});
 
 //update some fields off a book record
-app.patch("/book/:isbn_no", function (req, res) {});
+app.patch("/book/:isbn_no", function (req, res) {
+  try{
+    const isbn_no = req.params.isbn_no;
+    // const book = 
+  }
+});
 
 //delete record of a book
 app.patch("/book/:isbn_no", function (req, res) {});
