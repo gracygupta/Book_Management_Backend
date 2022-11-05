@@ -155,10 +155,23 @@ app.put("/book/:from_isbn_no", async (req, res) => {
 });
 
 //update some fields off a book record
-app.patch("/book/:isbn_no", function (req, res) {
-  try{
+app.patch("/book/:isbn_no", async (req, res) => {
+  try {
     const isbn_no = req.params.isbn_no;
-    // const book = 
+    const bookData = await Book.find({ isbn_no: isbn_no });
+    const name = req.query.name || bookData[0].name;
+    const author = req.query.author || bookData[0].author_name;
+    const genre = req.query.genre || bookData[0].genre;
+    const inventory = parseInt(req.query.inventory || bookData[0].inventory);
+    const bookUpdate = await Book.updateOne(
+      { isbn_no: isbn_no },
+      { name: name, author_name: author, genre: genre, inventory: inventory }
+    );
+    console.log(bookUpdate);
+    res.send("Book records modified");
+  } catch (e) {
+    console.log(e);
+    res.send("Book does not find");
   }
 });
 
