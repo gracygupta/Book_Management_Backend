@@ -68,7 +68,6 @@ app.delete("/books", async (req, res) => {
       .catch((e) => {
         console.log(e);
       });
-    // booksDelete;
     console.log("All records deleted");
     res.send("All Documents deleted");
   } catch (e) {
@@ -76,13 +75,6 @@ app.delete("/books", async (req, res) => {
     res.send(e);
   }
 });
-// Book.deleteMany({})
-//   .then(() => {
-//     console.log("success");
-//   })
-//   .catch((e) => {
-//     console.log(e);
-//   });
 
 //returns books having value less than n in inventory
 app.get("/books/find_books_needed", async (req, res) => {
