@@ -171,12 +171,25 @@ app.patch("/book/:isbn_no", async (req, res) => {
     res.send("Book records modified");
   } catch (e) {
     console.log(e);
-    res.send("Book does not find");
+    res.send("Book record does not find");
   }
 });
 
 //delete record of a book
-app.patch("/book/:isbn_no", function (req, res) {});
+app.delete("/book/:isbn_no", async (req, res) => {
+  try {
+    const isbn_no = req.params.isbn_no;
+    if (isbn_no) {
+      const bookDelete = Book.deleteOne({ isbn_no: isbn_no });
+      result = "Book deleted";
+    } else {
+      result = "isbn_no missing";
+    }
+    res.send(result);
+  } catch (e) {
+    res.send("Book record does not exist");
+  }
+});
 
 //issue book: decrease inventory
 app.get("/book/:isbn_no", function (req, res) {});
