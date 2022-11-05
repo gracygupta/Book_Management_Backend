@@ -117,8 +117,14 @@ app.get("/book/:isbn_no", async (req, res) => {
   try {
     const isbn_no = req.params.isbn_no;
     const bookData = await Book.find({ isbn_no: isbn_no });
-    console.log("Data retrieved");
-    res.send(bookData);
+    if (bookData.length === 0) {
+      result = "Book does not found";
+      console.log(result);
+    } else {
+      console.log("Data retrieved");
+      result = bookData;
+    }
+    res.send(result);
   } catch (e) {
     console.log(e);
     res.send("Oops! an error occured, please check URL and try again.");
@@ -180,7 +186,7 @@ app.delete("/book/:isbn_no", async (req, res) => {
   try {
     const isbn_no = req.params.isbn_no;
     if (isbn_no) {
-      const bookDelete = Book.deleteOne({ isbn_no: isbn_no });
+      const bookDelete = await Book.deleteOne({ isbn_no: isbn_no });
       result = "Book deleted";
     } else {
       result = "isbn_no missing";
@@ -192,7 +198,39 @@ app.delete("/book/:isbn_no", async (req, res) => {
 });
 
 //issue book: decrease inventory
-app.get("/book/:isbn_no", function (req, res) {});
+app.get("/book/:isbn_no/:issue", async (req, res) => {
+  try {
+    var result = "";
+    const isbn_no = req.params.isbn_no;
+    const issue = req.params.issue.toLowerCase();
+    const book = await Book.find({ isbn_no: isbn_no });
+    console.log(book);
+    if (issue == "true") {
+      if (book[0].inventory > 0) {
+        const inventory = book[0].inventory - 1;
+        const issueBook = await Book.updateOne(
+          { isbn_no: isbn_no },
+          { inventory: inventory }
+        );
+        console.log(issueBook);
+        res.send("Book Issued");
+      } else {
+        res.send("Book unavailable");
+      }
+    } else if (issue == "false") {
+      console.log("redirecting");
+      const r = "/book/" + isbn_no;
+      console.log(r);
+      res.redirect(r);
+    } else {
+      console.log("invalid issue value");
+      res.send("Invalid query string value");
+    }
+  } catch (e) {
+    console.log(e);
+    res.send("Something went wrong!");
+  }
+});
 
 //listens to port 3000
 app.listen(port, function () {
