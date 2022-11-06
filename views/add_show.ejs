@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body style="height: 200vh; width: 100vw">
+    <div
+      style="
+        width: 100%;
+        height: 100vh;
+        background-color: #130f40;
+        overflow: scroll;
+      "
+    >
+      <div
+        style="
+          padding: 40px;
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <% if (books.length){%><% for (let book of books) { %>
+        <div
+          class="card"
+          style="width: 18rem; background-color: #dedede; margin: 10px"
+        >
+          <div class="card-body" style="height: 100%">
+            <h5
+              class="card-title"
+              style="height: 4rem; width: 100%; color: black"
+            >
+              <%- book.name %>
+            </h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+              Author: <%- book.author_name %>
+            </h6>
+            <h6 class="card-subtitle mb-2 text-muted">
+              Genre: <%- book.genre %>
+            </h6>
+            <h6 class="card-subtitle mb-2 text-muted">
+              Book Number: <%- book.isbn_no %>
+            </h6>
+          </div>
+        </div>
+        <% } %><% } else { %>
+        <h4 style="height: 2px; color: white">No Books to Show</h4>
+        <% } %>
+      </div>
+      <br />
+      <div
+        style="
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <button
+          class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3"
+          type="submit"
+          style="background-color: #dedede; color: #130f40; border: none"
+        >
+          <a href="#form" style="text-decoration: none; color: black">
+            Add Book</a
+          >
+        </button>
+      </div>
+    </div>
+
+    <!-- Book add template -->
+
+    <section
+      id="form"
+      class="h-100 gradient-form"
+      style="background-color: #dedede"
+    >
+      <div class="container py-5 h-100">
+        <div
+          class="row d-flex justify-content-center align-items-center h-100"
+          style="height: 0; padding: 40px"
+        >
+          <div class="col-xl-10">
+            <div class="card rounded-3 text-black">
+              <div class="row g-0">
+                <div class="col-lg-6">
+                  <div class="card-body p-md-5 mx-md-4">
+                    <div class="text-center">
+                      <h2 class="mt-1 mb-5 pb-1" style="color: #130f40">
+                        ADD BOOK
+                      </h2>
+                    </div>
+
+                    <form action="/books" method="post">
+                      <div class="form-outline">
+                        <label class="form-label">Issue Number</label>
+                        <input
+                          type="number"
+                          min="1000"
+                          value="1000"
+                          name="isbn_no"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter issue number"
+                        />
+                      </div>
+                      <br />
+                      <div class="form-outline">
+                        <label class="form-label">Name</label>
+                        <input
+                          type="text"
+                          name="name"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter book name"
+                        />
+                      </div>
+                      <br />
+                      <div class="form-outline">
+                        <label class="form-label">Author</label>
+                        <input
+                          type="text"
+                          name="author_name"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter author name"
+                        />
+                      </div>
+                      <br />
+                      <div class="form-outline">
+                        <label class="form-label">Genre</label>
+                        <select
+                          name="genre"
+                          id="form2Example11"
+                          class="form-select form-control"
+                          style="color: grey"
+                          aria-label="Default select example"
+                        >
+                          <option selected>Select genre</option>
+                          <option value="Mythology">Mythology</option>
+                          <option value="Fiction">Fiction</option>
+                          <option value="Horror">Horror</option>
+                          <option value="Classics">Classics</option>
+                          <option value="Biographies & Autobiographies">
+                            Biographies & Autobiographies
+                          </option>
+                        </select>
+                      </div>
+                      <br />
+                      <div class="form-outline">
+                        <label class="form-label">Inventory</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value="1"
+                          name="inventory"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter available books"
+                        />
+                      </div>
+                      <br /><br />
+
+                      <div class="text-center pt-1 mb-5 pb-1">
+                        <button
+                          class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3"
+                          type="submit"
+                          style="background-color: #130f40; color: #dedede"
+                        >
+                          Add Book
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div
+                  class="col-lg-6 d-flex align-items-center gradient-custom-2"
+                >
+                  <img
+                    src="../img/addBook.jpg"
+                    style="width: 100%; height: 100%"
+                    alt=""
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

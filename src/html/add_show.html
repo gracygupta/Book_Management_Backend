@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body style="height: 200vh; width: 100vw">
+    <div
+      style="
+        width: 100%;
+        height: 100vh;
+        background-color: #130f40;
+        overflow: scroll;
+      "
+    >
+      <div
+        style="
+          padding: 40px;
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: row;
+          text-align: center;
+        "
+      >
+        <h4 style="height: 2px; color: white">No books to show</h4>
+        <!-- <% } %> -->
+      </div>
+    </div>
+    <section class="h-100 gradient-form" style="background-color: #eee">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-xl-10">
+            <div class="card rounded-3 text-black">
+              <div class="row g-0">
+                <div class="col-lg-6">
+                  <div class="card-body p-md-5 mx-md-4">
+                    <div class="text-center">
+                      <img
+                        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
+                        style="width: 185px"
+                        alt="logo"
+                      />
+                      <h4 class="mt-1 mb-5 pb-1">ADD BOOK</h4>
+                    </div>
+
+                    <form action="/books" method="post">
+                      <div class="form-outline">
+                        <input
+                          type="number"
+                          name="isbn_no"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter issue number"
+                        />
+                        <label class="form-label">Issue Number</label>
+                      </div>
+                      <div class="form-outline">
+                        <input
+                          type="text"
+                          name="name"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter book name"
+                        />
+                        <label class="form-label">Name</label>
+                      </div>
+                      <div class="form-outline">
+                        <input
+                          type="text"
+                          name="author_name"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter author name"
+                        />
+                        <label class="form-label">Author</label>
+                      </div>
+                      <div class="form-outline">
+                        <select
+                          name="genre"
+                          id="form2Example11"
+                          class="form-select form-control"
+                          style="color: grey"
+                          aria-label="Default select example"
+                        >
+                          <option selected>Select genre</option>
+                          <option value="Action and Adventure">
+                            Action and Adventure
+                          </option>
+                          <option value="Fiction">Fiction</option>
+                          <option value="Horror">Horror</option>
+                          <option value="Classics">Classics</option>
+                          <option value="Fantasy">Fantasy</option>
+                        </select>
+                        <label class="form-label">Genre</label>
+                      </div>
+                      <div class="form-outline">
+                        <input
+                          type="text"
+                          name="inventory"
+                          id="form2Example11"
+                          class="form-control"
+                          placeholder="Enter available books"
+                        />
+                        <label class="form-label">Inventory</label>
+                      </div>
+
+                      <div class="text-center pt-1 mb-5 pb-1">
+                        <button
+                          class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3"
+                          type="submit"
+                        >
+                          Add Book
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div
+                  class="col-lg-6 d-flex align-items-center gradient-custom-2"
+                >
+                  <img
+                    src="../img/addBook.jpg"
+                    style="width: 100%; height: 100%"
+                    alt=""
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

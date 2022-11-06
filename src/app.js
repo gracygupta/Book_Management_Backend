@@ -7,26 +7,34 @@ const port = process.env.PORT || 8080;
 
 const app = express();
 
-// app.use("view engine", "ejs");
+app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get("/", function (req, res) {
-  res.write("You are successfully Logined.");
-  res.write("\nWelcome to the Home Page.");
-  res.send();
-  // message = "You are successfully Logined.";
-  // res.render("home", { message: message });
+  res.render("home");
 });
 
 //shows all books record
 app.get("/books", async (req, res) => {
+  var page = req.query.page;
+  var limit = req.query.limit;
   try {
     const booksData = await Book.find();
-    const result = booksData;
-    console.log("Data Retrieved\n" + result);
-    res.send(result);
+    let sliced = [];
+    console.log(page + " " + limit);
+    if (page == undefined || limit == undefined) {
+      console.log("hvjac");
+      const result = booksData;
+      res.render("add_show", { books: result });
+    } else {
+      page = parseInt(req.query.page);
+      limit = parseInt(req.query.limit);
+      let c = (page - 1) * limit;
+      sliced = booksData.slice(c, c + limit);
+      res.render("add_show", { books: sliced });
+    }
   } catch (e) {
     res.send(e);
   }
@@ -34,7 +42,6 @@ app.get("/books", async (req, res) => {
 
 //create new book record
 app.post("/books", async (req, res) => {
-  var result = "";
   try {
     console.log(req.body);
     const bname = req.body.name;
@@ -54,20 +61,27 @@ app.post("/books", async (req, res) => {
     book
       .save()
       .then(function () {
-        res.send("Book Record Added.");
+        console.log("Book Record Added.");
+        res.redirect("/books");
       })
       .catch(async (err) => {
         console.log(res.statusCode);
         const book = await Book.find({ isbn_no: bn_no });
         if (book.length != 0) {
-          result = "Book number already exist.";
+          var message_1 = "OOPS!";
+          var message_2 = "Book number already exist.";
         } else {
           if (inventory < 0) {
-            result = "Inventory Invalid!! (Must be greater than 0)";
+            var message_1 = "OOPS!";
+            var message_2 = "Inventory Invalid!! (Must be greater than 0)";
           }
         }
         console.log(err);
-        res.send(result);
+        res.render("delete", {
+          message_1: message_1,
+          message_2: message_2,
+          brace: "(",
+        });
       });
   } catch (e) {
     console.log(e);
@@ -79,15 +93,32 @@ app.post("/books", async (req, res) => {
 app.delete("/books", async (req, res) => {
   try {
     const bookDel = Book.deleteMany({});
+    var message_1 = "";
+    var message_2 = "";
+    var brace = "";
     bookDel
       .then(() => {
-        console.log("success");
+        console.log("All records deleted");
+        message_1 = "Success";
+        message_2 = "All Book Records Deleted";
+        brace = ")";
+        res.render("delete", {
+          message_1: message_1,
+          message_2: message_2,
+          brace: brace,
+        });
       })
       .catch((e) => {
         console.log(e);
+        message_1 = "Oops!";
+        message_2 = "Error in deletion ";
+        brace = "(";
+        res.render("delete", {
+          message_1: message_1,
+          message_2: message_2,
+          brace: brace,
+        });
       });
-    console.log("All records deleted");
-    res.send("All Documents deleted");
   } catch (e) {
     console.log(e);
     res.send(e);
@@ -96,56 +127,66 @@ app.delete("/books", async (req, res) => {
 
 //returns books having value less than n in inventory
 app.get("/books/find_books_needed", async (req, res) => {
+  var message_1 = "";
+  var message_2 = "";
   const n = req.query.n;
   console.log("Value of n = " + n);
-  var result = "";
   if (n === undefined) {
-    result = "Please specify query n in the url.";
+    message_1 = "OOPS!";
+    message_2 = "'n' not defined";
+    brace = "(";
     console.log("n not specified");
+    res.render("delete", {
+      message_1: message_1,
+      message_2: message_2,
+      brace: brace,
+    });
   } else {
     const booksData = await Book.find({ inventory: { $lt: n } });
     result = booksData;
     console.log("Data retrieved");
+    res.render("show", { books: result });
   }
-  res.send(result);
 });
 
 //returns all books with inventory 0
 app.get("/books/unavailable_books", async (req, res) => {
   const booksData = await Book.find({ inventory: 0 });
-  console.log(booksData);
-  var result = "";
-  if (booksData.length === 0) {
-    console.log("No books to show");
-    result = "No books to show";
-  } else {
-    result = booksData;
-  }
-  res.send(result);
+  console.log("Required Books\n" + booksData);
+  res.render("show", { books: booksData });
 });
 
 //handling get error when params are missing
 app.get("/book", function (req, res) {
-  res.send("Wrong path! Check URL");
+  var message_1 = "ERROR 404";
+  var message_2 = "Check URL";
+  res.render("delete", {
+    message_1: message_1,
+    message_2: message_2,
+    brace: "(",
+  });
 });
 
 //fetch records of particular book
 app.get("/book/:isbn_no", async (req, res) => {
-  var result = "";
   try {
     const isbn_no = req.params.isbn_no;
     const bookData = await Book.find({ isbn_no: isbn_no });
     if (bookData.length === 0) {
-      result = "Book does not found";
-      console.log(result);
+      console.log(message_2);
     } else {
       console.log("Data retrieved");
-      result = bookData;
     }
-    res.send(result);
+    res.render("show", { books: bookData });
   } catch (e) {
     console.log(e);
-    res.send("Oops! an error occured, please check URL and try again.");
+    var message_1 = "OOPS!";
+    var message_2 = "Something went wrong";
+    res.render("delete", {
+      message_1: message_1,
+      message_2: message_2,
+      brace: "(",
+    });
   }
 });
 
