@@ -7,12 +7,17 @@ const port = process.env.PORT || 8080;
 
 const app = express();
 
+// app.use("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get("/", function (req, res) {
-  res.send("thanku");
+  res.write("You are successfully Logined.");
+  res.write("\nWelcome to the Home Page.");
+  res.send();
+  // message = "You are successfully Logined.";
+  // res.render("home", { message: message });
 });
 
 //shows all books record
@@ -29,32 +34,45 @@ app.get("/books", async (req, res) => {
 
 //create new book record
 app.post("/books", async (req, res) => {
-  console.log(req.body);
+  var result = "";
+  try {
+    console.log(req.body);
+    const bname = req.body.name;
+    const bn_no = parseInt(req.body.isbn_no);
+    const author = req.body.author_name;
+    const genre = req.body.genre;
+    const inventory = parseInt(req.body.inventory);
 
-  const bname = req.body.name;
-  const bn_no = req.body.isbn_no;
-  const author = req.body.author_name;
-  const genre = req.body.genre;
-  const inventory = req.body.inventory;
-
-  const book = new Book({
-    name: bname,
-    isbn_no: bn_no,
-    author_name: author,
-    genre: genre,
-    inventory: inventory,
-  });
-
-  book
-    .save()
-    .then(function () {
-      res.send("Book Record Added.");
-    })
-    .catch(function (err) {
-      console.log(res.statusCode);
-      res.send("Oop! Some error occured. PLease check and try again.");
-      console.log(err);
+    const book = new Book({
+      isbn_no: bn_no,
+      name: bname,
+      author_name: author,
+      genre: genre,
+      inventory: inventory,
     });
+
+    book
+      .save()
+      .then(function () {
+        res.send("Book Record Added.");
+      })
+      .catch(async (err) => {
+        console.log(res.statusCode);
+        const book = await Book.find({ isbn_no: bn_no });
+        if (book.length != 0) {
+          result = "Book number already exist.";
+        } else {
+          if (inventory < 0) {
+            result = "Inventory Invalid!! (Must be greater than 0)";
+          }
+        }
+        console.log(err);
+        res.send(result);
+      });
+  } catch (e) {
+    console.log(e);
+    res.send("Oop! Some error occured. PLease check and try again.");
+  }
 });
 
 //delete all books records
