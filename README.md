@@ -14,6 +14,8 @@ Step 5: Create a .env file in the root directory. Inside .env write
 
 Step 6: Type "npm run dev" on your command line.(Make sure you are inside current project directory)
         Case 1: If on console "mongodb is connected" is printed, You are all ready to proceed.
-        Case 2: Else follow steps perfectly.
+        Case 2: Else follow steps correctly.
+  
+   For futher information regarding api usage refer its documentation --> https://documenter.getpostman.com/view/24067724/2s8YYJqhsL
         
         
