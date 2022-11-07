@@ -1,20 +1,20 @@
 # Book_Management_Backend
-Book Management using node js - express , mongoose, ejs.\n\n
+Book Management using node js - express , mongoose, ejs.<br/><br/>
 
-To see the code, follow the steps:\n
-Step 1: Fork the repository.\n
-Step 2: Clone it on your local using ~  git clone https://github.com/gracygupta/Book_Management_Backend.git  ~ command.\n
-Step 3: On your command line type  npm install (make sure you have installed npm).\n
-Step 5: Create a .env file in the root directory. Inside .env write\n\t\t
-                      DB_Host = mongodb+srv\n\t\t
-                      DB_USER = <your mongodb atlas's network access username>\n\t\t
-                      DB_NAME = <database_name>\n\t\t
-                      DB_PASSWORD = <passwors>\n\t\t
-                      PORT = 8000 (or you can specify anothor)\n
+To see the code, follow the steps:<br/>
+Step 1: Fork the repository.<br/>
+Step 2: Clone it on your local using ~  git clone https://github.com/gracygupta/Book_Management_Backend.git  ~ command.<br/>
+Step 3: On your command line type  npm install (make sure you have installed npm).<br/>
+Step 5: Create a .env file in the root directory. Inside .env write<br/>&emsp;&emsp;
+                      DB_Host = mongodb+srv<br/>&emsp;&emsp;
+                      DB_USER = <your mongodb atlas's network access username><br/>&emsp;&emsp;
+                      DB_NAME = <database_name><br/>&emsp;&emsp;
+                      DB_PASSWORD = <passwors><br/>&emsp;&emsp;
+                      PORT = 8000 (or you can specify anothor)<br/>
 
-Step 6: Type "npm run dev" on your command line.(Make sure you are inside current project directory)\n\t
-        Case 1: If on console "mongodb is connected" is printed, You are all ready to proceed.\n\t
-        Case 2: Else follow steps correctly.\n\n
+Step 6: Type "npm run dev" on your command line.(Make sure you are inside current project directory)<br/>&emsp;
+        Case 1: If on console "mongodb is connected" is printed, You are all ready to proceed.<br/>&emsp;
+        Case 2: Else follow steps correctly.<br/><br/>
   
    For futher information regarding api usage refer its documentation --> https://documenter.getpostman.com/view/24067724/2s8YYJqhsL
         
