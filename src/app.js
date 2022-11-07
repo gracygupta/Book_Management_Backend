@@ -20,6 +20,7 @@ app.get("/", function (req, res) {
 app.get("/books", async (req, res) => {
   var page = req.query.page;
   var limit = req.query.limit;
+  console.log(req.body);
   try {
     const booksData = await Book.find();
     let sliced = [];
@@ -298,14 +299,20 @@ app.patch("/book/:isbn_no", async (req, res) => {
     const isbn_no = req.params.isbn_no;
     const bookData = await Book.find({ isbn_no: isbn_no });
     if (bookData.length != 0) {
-    const to_isbn_no = req.query.to_isbn_no;
+      const to_isbn_no = req.query.to_isbn_no;
       const name = req.query.name || bookData[0].name;
       const author = req.query.author || bookData[0].author_name;
       const genre = req.query.genre || bookData[0].genre;
       const inventory = parseInt(req.query.inventory || bookData[0].inventory);
       const bookUpdate = await Book.updateOne(
         { isbn_no: isbn_no },
-        { isbn_no: to_isbn_no ,name: name, author_name: author, genre: genre, inventory: inventory }
+        {
+          isbn_no: to_isbn_no,
+          name: name,
+          author_name: author,
+          genre: genre,
+          inventory: inventory,
+        }
       );
       console.log(bookUpdate);
       message_1 = "Book record modified";
@@ -371,17 +378,16 @@ app.delete("/book/:isbn_no", async (req, res) => {
 });
 
 //issue book: decrease inventory
-app.get("/book/:isbn_no/:issue", async (req, res) => {
+app.get("/book/issue_book/:isbn_no", async (req, res) => {
   var message_1 = "";
   var message_2 = "";
   try {
     var result = "";
     const isbn_no = req.params.isbn_no;
-    const issue = req.params.issue.toLowerCase();
-    const book = await Book.find({ isbn_no: isbn_no });
+    var book = await Book.find({ isbn_no: isbn_no });
     console.log(book);
-    if (book.length != 0) {
-      if (issue == "true") {
+    if (isbn_no) {
+      if (book.length != 0) {
         if (book[0].inventory > 0) {
           const inventory = book[0].inventory - 1;
           const issueBook = await Book.updateOne(
@@ -389,8 +395,8 @@ app.get("/book/:isbn_no/:issue", async (req, res) => {
             { inventory: inventory }
           );
           console.log(issueBook);
-          message_1 = "Book Issued";
-          res.render("success", { message: message_1 });
+          book = await Book.find({ isbn_no: isbn_no });
+          res.render("show", { books: book });
         } else {
           message_1 = "Sorry!";
           message_2 = "Book unavailable";
@@ -400,19 +406,23 @@ app.get("/book/:isbn_no/:issue", async (req, res) => {
             brace: "(",
           });
         }
-      } else if (issue == "false") {
-        console.log("issue is false");
-        res.redirect("books");
       } else {
-        console.log("invalid issue value");
         message_1 = "OOPS!";
-        message_2 = "Invalid 'issue' value";
+        message_2 = "Book not exist";
         res.render("error", {
           message_1: message_1,
           message_2: message_2,
           brace: "(",
         });
       }
+    } else {
+      message_1 = "ERROR 404";
+      message_2 = "Check URL";
+      res.render("error", {
+        message_1: message_1,
+        message_2: message_2,
+        brace: "(",
+      });
     }
   } catch (e) {
     console.log(e);
