@@ -2,18 +2,127 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 require("./db/conn");
-const Book = require("./models/books");
-const port = process.env.PORT || 3000;
+const Book = require("./models/books").Book;
+const User = require("./models/books").User;
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
+const cookieParser = require("cookie-parser");
 
+const SECRET_KEY = "AUTHORIZED";
+const oneDay = 1000 * 60 * 60 * 24;
+const port = process.env.PORT || 3000;
 const app = express();
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", function (req, res) {
   res.render("home");
+});
+
+//servers signup page
+app.get("/signup", function (req, res) {
+  res.render("signup");
+});
+
+//for getting register
+app.post("/signup", async (req, res) => {
+  try {
+    console.log(req.body);
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      res.render("error", {
+        message_1: "OOPS!",
+        message_2: "User already exist",
+        brace: "(",
+      });
+    }
+    if (req.body.password === req.body.cpassword) {
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      const user = await User.create({
+        email: req.body.email,
+        nickname: req.body.nickname,
+        role: req.body.role,
+        password: hashedPassword,
+      });
+      console.log("User Added", user);
+      req.message = "User registered";
+      res.render("login", { message: "User Registered. Please login here!" });
+    } else {
+      res.render("error", {
+        message_1: "SORRY!",
+        message_2: "Password do not match",
+        brace: "(",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.render("error", {
+      message_1: "OOPS!",
+      message_2: "Something went wrong",
+      brace: "(",
+    });
+  }
+});
+
+//serves login page
+app.get("/login", function (req, res) {
+  res.render("login", { message: "" });
+});
+
+//for logging in
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  console.log(req.body);
+  try {
+    const existingUser = await User.findOne({ email: email });
+    if (!existingUser) {
+      res.render("error", {
+        message_1: "OOPS!",
+        message_2: "User not found",
+        brace: "(",
+      });
+    }
+    const matchPassword = await bcrypt.compare(password, existingUser.password);
+    if (!matchPassword) {
+      res.render("error", {
+        message_1: "SORRY!",
+        message_2: "Invalid Credentials",
+        brace: "(",
+      });
+    }
+    const token = jwt.sign(
+      { email: existingUser.email, id: existingUser._id },
+      SECRET_KEY
+    );
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + oneDay),
+      httpOnly: true,
+    });
+    console.log("inside login", req.cookies.token);
+    res.redirect("/profile");
+  } catch (err) {
+    console.log(err);
+    res.render("error", {
+      message_1: "OOPS!",
+      message_2: "Something went wrong",
+      brace: "(",
+    });
+  }
+});
+
+//serves profile page
+app.get("/profile", auth, async function (req, res) {
+  const user = await User.findOne({ _id: req.userId });
+  res.render("profile", {
+    email: user.email,
+    role: user.role,
+    name: "",
+  });
 });
 
 //shows all books record
