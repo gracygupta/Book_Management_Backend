@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    books: [{ type: "ObjectId", ref: "Books" }],
+    books: [{ type: mongoose.Schema.Types.ObjectId, ref: "Books" }],
   },
   { timestamps: true }
 );

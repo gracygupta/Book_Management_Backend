@@ -77,7 +77,6 @@ app.get("/login", function (req, res) {
 //for logging in
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
   try {
     const existingUser = await User.findOne({ email: email });
     if (!existingUser) {
@@ -103,7 +102,6 @@ app.post("/login", async (req, res) => {
       expires: new Date(Date.now() + oneDay),
       httpOnly: true,
     });
-    console.log("inside login", req.cookies.token);
     res.redirect("/profile");
   } catch (err) {
     console.log(err);
@@ -126,7 +124,7 @@ app.get("/profile", auth, async function (req, res) {
 });
 
 //shows all books record
-app.get("/books", async (req, res) => {
+app.get("/books", auth, async (req, res) => {
   var page = req.query.page;
   var limit = req.query.limit;
   console.log(req.body);
@@ -158,50 +156,59 @@ app.get("/books", async (req, res) => {
 });
 
 //create new book record
-app.post("/books", async (req, res) => {
+app.post("/books", auth, async (req, res) => {
   var message_1 = "";
   var message_2 = "";
+  const user = await User.findOne({ _id: req.userId });
   try {
-    console.log(req.body);
-    const bname = req.body.name;
-    const bn_no = parseInt(req.body.isbn_no);
-    const author = req.body.author_name;
-    const genre = req.body.genre;
-    const inventory = parseInt(req.body.inventory);
+    if (user.role === "admin") {
+      console.log(req.body);
+      const bname = req.body.name;
+      const bn_no = parseInt(req.body.isbn_no);
+      const author = req.body.author_name;
+      const genre = req.body.genre;
+      const inventory = parseInt(req.body.inventory);
 
-    const book = new Book({
-      isbn_no: bn_no,
-      name: bname,
-      author_name: author,
-      genre: genre,
-      inventory: inventory,
-    });
-
-    book
-      .save()
-      .then(function () {
-        console.log("Book Record Added.");
-        res.redirect("/books");
-      })
-      .catch(async (err) => {
-        console.log(res.statusCode);
-        const book = await Book.find({ isbn_no: bn_no });
-        if (book.length != 0) {
-          message_1 = "OOPS!";
-          message_2 = "Book number already exist.";
-        } else {
-          if (inventory < 0) {
-            message_1 = "OOPS!";
-            message_2 = "Inventory Invalid!! (Must be greater than 0)";
-          }
-        }
-        console.log(err);
-        res.render("error", {
-          message_1: message_1,
-          message_2: message_2,
-          brace: "(",
-        });
+      const book = new Book({
+        isbn_no: bn_no,
+        name: bname,
+        author_name: author,
+        genre: genre,
+        inventory: inventory,
       });
+
+      book
+        .save()
+        .then(function () {
+          console.log("Book Record Added.");
+          res.redirect("/books");
+        })
+        .catch(async (err) => {
+          console.log(res.statusCode);
+          const book = await Book.find({ isbn_no: bn_no });
+          if (book.length != 0) {
+            message_1 = "OOPS!";
+            message_2 = "Book number already exist.";
+          } else {
+            if (inventory < 0) {
+              message_1 = "OOPS!";
+              message_2 = "Inventory Invalid!! (Must be greater than 0)";
+            }
+          }
+          console.log(err);
+          res.render("error", {
+            message_1: message_1,
+            message_2: message_2,
+            brace: "(",
+          });
+        });
+    } else {
+      res.render("error", {
+        message_1: "SORRY",
+        message_2: "You are not Authorized",
+        brace: "(",
+      });
+    }
   } catch (e) {
     console.log(e);
     message_1 = "Oops!";
@@ -252,32 +259,41 @@ app.delete("/books", async (req, res) => {
 });
 
 //returns books having value less than n in inventory
-app.get("/books/find_books_needed", async (req, res) => {
-  var message_1 = "";
-  var message_2 = "";
-  const n = req.query.n;
-  if (n === undefined) {
-    message_1 = "OOPS!";
-    message_2 = "'n' not defined";
-    console.log("n not specified");
+app.get("/books/find_books_needed", auth, async (req, res) => {
+  const user = await User.findOne({ _id: req.userId });
+  if (user.role === "admin") {
+    var message_1 = "";
+    var message_2 = "";
+    const n = req.query.n;
+    if (n === undefined) {
+      message_1 = "OOPS!";
+      message_2 = "'n' not defined";
+      console.log("n not specified");
+      res.render("error", {
+        message_1: message_1,
+        message_2: message_2,
+        brace: "(",
+      });
+    } else {
+      const booksData = await Book.find({ inventory: { $lt: n } });
+      if (booksData.length != 0) {
+        console.log("Data retrieved");
+      } else {
+        console.log("No book found");
+      }
+      res.render("show", { books: booksData });
+    }
+  } else {
     res.render("error", {
-      message_1: message_1,
-      message_2: message_2,
+      message_1: "SORRY",
+      message_2: "You are not Authorized",
       brace: "(",
     });
-  } else {
-    const booksData = await Book.find({ inventory: { $lt: n } });
-    if (booksData.length != 0) {
-      console.log("Data retrieved");
-    } else {
-      console.log("No book found");
-    }
-    res.render("show", { books: booksData });
   }
 });
 
 //returns all books with inventory 0
-app.get("/books/unavailable_books", async (req, res) => {
+app.get("/books/unavailable_books", auth, async (req, res) => {
   const booksData = await Book.find({ inventory: 0 });
   if (booksData.length != 0) {
     console.log("Required Books\n" + booksData);
@@ -296,6 +312,12 @@ app.get("/book", function (req, res) {
     message_2: message_2,
     brace: "(",
   });
+});
+
+//get book
+app.get("/get/book", auth, function (req, res) {
+  console.log(req.query.isbn_no);
+  res.redirect(`/book/${req.query.isbn_no}`);
 });
 
 //fetch records of particular book
@@ -486,29 +508,53 @@ app.delete("/book/:isbn_no", async (req, res) => {
   }
 });
 
+//issues book
+app.get("/issue_book", auth, function (req, res) {
+  res.redirect(`/book/issue_book/${req.query.isbn_no}`);
+});
+
 //issue book: decrease inventory
-app.get("/book/issue_book/:isbn_no", async (req, res) => {
+app.get("/book/issue_book/:isbn_no", auth, async (req, res) => {
   var message_1 = "";
   var message_2 = "";
+  const user = await User.findOne({ _id: req.userId });
   try {
-    var result = "";
-    const isbn_no = req.params.isbn_no;
-    var book = await Book.find({ isbn_no: isbn_no });
-    console.log(book);
-    if (isbn_no) {
-      if (book.length != 0) {
-        if (book[0].inventory > 0) {
-          const inventory = book[0].inventory - 1;
-          const issueBook = await Book.updateOne(
-            { isbn_no: isbn_no },
-            { inventory: inventory }
-          );
-          console.log(issueBook);
-          book = await Book.find({ isbn_no: isbn_no });
-          res.render("show", { books: book });
+    if (user.role === "user") {
+      var result = "";
+      const isbn_no = req.params.isbn_no;
+      var book = await Book.find({ isbn_no: isbn_no });
+      if (isbn_no) {
+        if (book.length != 0) {
+          if (book[0].inventory > 0) {
+            const inventory = book[0].inventory - 1;
+            await Book.updateOne(
+              { isbn_no: isbn_no },
+              { inventory: inventory }
+            ).then(() => {
+              console.log(book[0]._id);
+              user.books.push(book[0]._id);
+              user.save();
+              User.findById(book[0]._id)
+                .populate("books")
+                .exec((error, docs) => {
+                  if (error) throw error;
+                  console.log(docs);
+                });
+            });
+            book = await Book.find({ isbn_no: isbn_no });
+            res.render("show", { books: book });
+          } else {
+            message_1 = "Sorry!";
+            message_2 = "Book unavailable";
+            res.render("error", {
+              message_1: message_1,
+              message_2: message_2,
+              brace: "(",
+            });
+          }
         } else {
-          message_1 = "Sorry!";
-          message_2 = "Book unavailable";
+          message_1 = "OOPS!";
+          message_2 = "Book not exist";
           res.render("error", {
             message_1: message_1,
             message_2: message_2,
@@ -516,8 +562,8 @@ app.get("/book/issue_book/:isbn_no", async (req, res) => {
           });
         }
       } else {
-        message_1 = "OOPS!";
-        message_2 = "Book not exist";
+        message_1 = "ERROR 404";
+        message_2 = "Check URL";
         res.render("error", {
           message_1: message_1,
           message_2: message_2,
@@ -525,11 +571,9 @@ app.get("/book/issue_book/:isbn_no", async (req, res) => {
         });
       }
     } else {
-      message_1 = "ERROR 404";
-      message_2 = "Check URL";
       res.render("error", {
-        message_1: message_1,
-        message_2: message_2,
+        message_1: "OOPS!",
+        message_2: "Only users can issue a book",
         brace: "(",
       });
     }

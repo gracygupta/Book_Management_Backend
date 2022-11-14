@@ -4,7 +4,6 @@ const SECRET_KEY = "AUTHORIZED";
 const auth = (req, res, next) => {
   try {
     let token = req.params.token || req.cookies.token;
-    console.log("inside auth", token, req.cookies.token);
     if (token) {
       let user = jwt.verify(token, SECRET_KEY);
       if (user) {
@@ -32,4 +31,8 @@ const auth = (req, res, next) => {
   }
 };
 
+const admin = (req, res, next) => {
+  try {
+  } catch (err) {}
+};
 module.exports = auth;

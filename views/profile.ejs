@@ -235,79 +235,56 @@
                     <hr />
                     <button type="submit" class="btn btn-lg btn-block">
                       <a
-                        href="/password/reset"
+                        href="/books"
                         style="text-decoration: none; color: white"
-                        >Reset Password</a
+                        >See and Add Books</a
                       >
                     </button>
                     <span style="border-left: 1px solid #adb5bd"></span>
                     <button type="submit" class="btn btn-lg btn-block">
                       <a
-                        href="/user/nickname"
+                        href="/books/unavailable_books"
                         style="text-decoration: none; color: white"
-                        >Get Nickname</a
+                        >Unavailable Books</a
                       >
                     </button>
                     <hr />
-                    <form action="/user/nickname" method="post">
+                    <form action="/get/book" method="get">
                       <input
                         type="text"
                         id="form1Example13"
                         class="form-control form-control-lg"
-                        name="new_nickname"
+                        name="isbn_no"
                         style="font-size: 0.75rem"
-                        placeholder="Change your Nickname"
+                        placeholder="Enter book number"
                       />
                       <button
                         type="submit"
                         class="btn btn-lg btn-block"
                         style="color: white"
                       >
-                        Change Nickname
+                        See Book
                       </button>
-                      </form>
-                      <hr />
-
-                      <% if(role === "admin"){ %>
-                      <form action="/delete" method="get">
-                        <input
-                          type="text"
-                          id="form1Example13"
-                          class="form-control form-control-lg"
-                          name="email"
-                          style="font-size: 0.75rem"
-                          placeholder="Enter email to delete user"
-                        />
-                        <button
-                          type="submit"
-                          class="btn btn-lg btn-block"
-                          style="color: white"
-                        >
-                          Delete User
-                        </button>
-                      </form>
-                      <hr />
-
-                      <form action="/make_admin" method="get">
-                        <input
-                          type="text"
-                          id="form1Example13"
-                          class="form-control form-control-lg"
-                          name="email"
-                          style="font-size: 0.75rem"
-                          placeholder="Enter email to make admin"
-                        />
-                        <button
-                          type="submit"
-                          class="btn btn-lg btn-block"
-                          style="color: white"
-                        >
-                        Make Admin
-                        </button>
-                      </form>
-
-                      <% } %>
                     </form>
+                    <hr />
+                    <form action="/issue_book" method="get">
+                      <input
+                        type="text"
+                        id="form1Example13"
+                        class="form-control form-control-lg"
+                        name="isbn_no"
+                        style="font-size: 0.75rem"
+                        placeholder="Enter book number"
+                      />
+                      <button
+                        type="submit"
+                        class="btn btn-lg btn-block"
+                        style="color: white"
+                      >
+                        Issue Book
+                      </button>
+                    </form>
+                    <hr />
                   </div>
                 </div>
               </div>
