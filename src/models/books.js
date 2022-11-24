@@ -27,6 +27,7 @@ const bookSchema = new mongoose.Schema({
   },
 });
 
+const Book = new mongoose.model("Books", bookSchema);
 //defining structure of user
 const userSchema = new mongoose.Schema(
   {
@@ -57,7 +58,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 //creating new collection
-const Book = new mongoose.model("Books", bookSchema);
 const User = new mongoose.model("Users", userSchema);
 
 //Exporting collection object
