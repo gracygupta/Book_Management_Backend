@@ -32,8 +32,11 @@ app.get("/signup", function (req, res) {
 //for getting register
 app.post("/signup", async (req, res) => {
   try {
-    console.log(req.body);
-    const existingUser = await User.findOne({ email: req.body.email });
+    const existingUser = await User.findOne({ email: req.body.email })
+      .then()
+      .catch((e) => {
+        console.log(e);
+      });
     if (existingUser) {
       res.render("error", {
         message_1: "OOPS!",
